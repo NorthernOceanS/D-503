@@ -1,4 +1,3 @@
-
 import { systemInstance as system, Description, Usage, Block, Coordinate, Position, BlockType, BuildInstruction, canonicalGeneratorFactory } from 'norma-core';
 import { utils } from '../utils.js';
 import * as preset from './presetBuildingsInterface.js';
@@ -45,7 +44,7 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e
+            let { state, runtime } = e;
             let { positions, blockTypes, directions } = state
 
             let halt = false
@@ -103,7 +102,7 @@ system.registerCanonicalGenerator({
             else {
                 let blocks = []
 
-                //logger.log("verbose", "NZ is JULAO!")
+                runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
                 let minCoordinate = new Coordinate(
                     Math.min(positions[0].coordinate.x, positions[1].coordinate.x),
@@ -116,7 +115,7 @@ system.registerCanonicalGenerator({
                     Math.max(positions[0].coordinate.z, positions[1].coordinate.z)
                 )
 
-                //logger.log("verbose", "Yes, NZ is JULAO!")
+                runtime.logger && runtime.logger.log("verbose", "Yes, NZ is JULAO!")
 
                 for (let x = minCoordinate.x; x <= maxCoordinate.x; x++) {
                     for (let y = minCoordinate.y; y <= maxCoordinate.y; y++) {
@@ -137,7 +136,7 @@ system.registerCanonicalGenerator({
             }
         },
         UIHandler: function (e) {
-            let { state, data } = e;
+            let { state, data, runtime } = e;
             let { positions, blockTypes, directions } = state;
             if (data == "resetAll") {
                 positions.fill(undefined);
@@ -174,7 +173,7 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             if (state.generateByServer)
                 return [{
                     "type": "clone",
@@ -240,17 +239,17 @@ let createLineGenerator = canonicalGeneratorFactory({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = [];
 
             //let logger = runtime.logger;
-            //logger.log("verbose", "NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
             let positionArray = state.positions
             let blockTypeArray = state.blockTypes
             let directionArray = state.directions
 
-            //logger.log("verbose", "Yes, NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "Yes, NZ is JULAO!")
 
 
             let direction = (function () {
@@ -321,7 +320,7 @@ let createLineGenerator = canonicalGeneratorFactory({
     }
 })
 
-createLineGenerator.addPosition = function () {
+createLineGenerator.onAddPosition = function (e) {
     let { state, position, runtime } = e;
     if (state.doAcceptNewPosition) {
         let indexOfVacancy = state.positions.indexOf(undefined)
@@ -409,16 +408,16 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = []
 
-            //logger.log("verbose", "NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
             let positionArray = state.positions
             let blockTypeArray = state.blockTypes
             let directionArray = state.directions
 
-            //logger.log("verbose", "Yes, NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "Yes, NZ is JULAO!")
 
             //{"blockIdentifier":"minecraft:stained_hardened_clay","blockState":{"color":"cyan"}}
 
@@ -586,23 +585,22 @@ system.registerCanonicalGenerator({
             // following are postGenerate
             state.positions = [undefined]
             if (state["roadStyle"] == "custom") state.blockTypes = [undefined, undefined, undefined, undefined];
-            else state.blockTypeArray = [];
-            state.blockTypes = [];
+            else state.blockTypes = [];
             state.directions = [undefined];
             return blockArray
         },
         UIHandler: function (e) {
-            let { state, data } = e;
+            let { state, data, runtime } = e;
             if (data == "custom") {
-                //logger.log("info", "Using custom materials.")
-                //logger.log("info", "First block type for surface.")
-                //logger.log("info", "Second for white line.")
-                //logger.log("info", "Third for yellow line.")
-                //logger.log("info", "Fourth for bar.")
+                runtime.logger && runtime.logger.log("info", "Using custom materials.")
+                runtime.logger && runtime.logger.log("info", "First block type for surface.")
+                runtime.logger && runtime.logger.log("info", "Second for white line.")
+                runtime.logger && runtime.logger.log("info", "Third for yellow line.")
+                runtime.logger && runtime.logger.log("info", "Fourth for bar.")
                 state.blockTypes = [undefined, undefined, undefined, undefined]
             }
             else {
-                //logger.log("info", "Using preset materials. Custom materials are erased!")
+                runtime.logger && runtime.logger.log("info", "Using preset materials. Custom materials are erased!")
                 state.blockTypes = []
             }
         }
@@ -644,15 +642,15 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = []
 
-            //logger.log("verbose", "NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
             let positionArray = state.positions
             let blockTypeArray = state.blockTypes
             let directionArray = state.directions
-            //logger.log("verbose", "Yes, NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "Yes, NZ is JULAO!")
 
             let directionMark = (function () {
                 if (-45 <= directionArray[0].y && directionArray[0].y <= 45) return "+z"
@@ -825,15 +823,15 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = []
 
-            //logger.log("verbose", "NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
             let positionArray = state.positions
             let blockTypeArray = state.blockTypes
 
-            //logger.log("verbose", "Yes, NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "Yes, NZ is JULAO!")
 
             let coordinateArray = utils.coordinateGeometry.generateFilledPlanarTriangle(
                 positionArray[0].coordinate.x, positionArray[0].coordinate.y, positionArray[0].coordinate.z,
@@ -875,9 +873,9 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             if (state.generateByServer) {
-                //logger.log("verbose", "NZ is JULAO!")
+                runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
                 let x_min = Math.min(state.positions[0].coordinate.x, state.positions[1].coordinate.x)
                 let z_min = Math.min(state.positions[0].coordinate.z, state.positions[1].coordinate.z)
@@ -902,7 +900,7 @@ system.registerCanonicalGenerator({
             else {
                 let blockArray = []
 
-                //logger.log("verbose", "NZ is JULAO!")
+                runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
                 let positionArray = state.positions
                 let blockTypeArray = state.blockTypes
@@ -970,10 +968,10 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = [];
 
-            //logger.log("verbose", "NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
             let positionArray = state.positions
 
@@ -1026,12 +1024,12 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = []
 
 
 
-            //logger.log("verbose", "NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
             let positionArray = state.positions
             let blockTypeArray = state.blockTypes
@@ -1093,12 +1091,12 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = []
 
 
 
-            //logger.log("verbose", "NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
             let positionArray = state.positions
             let blockTypeArray = state.blockTypes
@@ -1146,7 +1144,7 @@ let flagGenerator = canonicalGeneratorFactory({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = []
             let positionArray = state.positions;
             let option = state;
@@ -1179,7 +1177,7 @@ flagGenerator.isValidParameter = function (e) {
     if (state.height % 2 != 0) result += "The height is odd!"
     if (result == "") return true;
 
-    runtime.logger && runtime.logger.log("info", result);
+    runtime.logger && runtime.logger.log("error", result);
     return false;
 };
 
@@ -1230,16 +1228,16 @@ system.registerCanonicalGenerator({
     },
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let blockArray = []
 
-            //logger.log("verbose", "NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "NZ is JULAO!")
 
             let positionArray = state.positions;
             let blockTypeArray = state.blockTypes;
             let directionArray = state.directions;
             let option = state;
-            //logger.log("verbose", "Yes, NZ is JULAO!")
+            runtime.logger && runtime.logger.log("verbose", "Yes, NZ is JULAO!")
 
             const directionMark = utils.geometry.getDirectionMark.horizontal(directionArray[0].y)
 
@@ -1298,7 +1296,7 @@ system.registerCanonicalGenerator({
                 },
                 "rail": function (coordinate) { return materials["rail"] },
                 "void/redstone": function (coordinate) {
-                    //logger.logObject("debug", coordinate)
+                    runtime.logger && runtime.logger.logObject("debug", coordinate)
                     if (coordinate.x % 16 == 0) return materials["red_stone_torch"]
                     else return materials["air"]
                 }
@@ -1571,8 +1569,8 @@ system.registerCanonicalGenerator({
     option: {},
     method: {
         UIHandler: function () { }, generate: function (e) {
-            let { state } = e;
-            return new BuildInstruction("writeBuildingStructureToLog", {
+            let { state, runtime } = e;
+            return new BuildInstruction("writeBuildingStructure", {
                 startCoordinate: state.positions[0].coordinate,
                 endCoordinate: state.positions[1].coordinate,
                 referenceCoordinate: state.positions[2].coordinate,
@@ -1588,7 +1586,7 @@ system.registerCanonicalGenerator({
     option: {},
     method: {
         generate: function (e) {
-            let { state } = e;
+            let { state, runtime } = e;
             let coordinate = state.positions[0].coordinate
 
             return Array.from(preset.presetBuildings.subway_station, a => new Block(new Position(new Coordinate(
